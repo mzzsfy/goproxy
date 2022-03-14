@@ -32,7 +32,7 @@ import (
 )
 
 var (
-	defaultRootCAPem = []byte(`
+	DefaultRootCAPem = []byte(`
 -----BEGIN CERTIFICATE-----
 MIIFdDCCA1ygAwIBAgIBATANBgkqhkiG9w0BAQsFADBZMQ4wDAYDVQQGEwVDaGlu
 YTEPMA0GA1UECBMGRnVKaWFuMQ8wDQYDVQQHEwZYaWFtZW4xDTALBgNVBAoTBE1h
@@ -66,7 +66,7 @@ irCRNyFcDrKoyILOOUiPxoEcclrwUBTB78JxVA8xKTbAh0aZQRZOZOz49qF4gA1d
 CDPlL4gNB6s=
 -----END CERTIFICATE-----
 `)
-	defaultRootKeyPem = []byte(`
+	DefaultRootKeyPem = []byte(`
 -----BEGIN RSA PRIVATE KEY-----
 MIIJKQIBAAKCAgEA2K6mkRtqdO+IKzjsAUgDL4BVcOFoidqXh8aY36QbW3E7hg/K
 Aoat2OiQJm2QvpkrrWLMWDoEtf6nrmPzCcA9k9mvdm7m+VwMztto7113G2deb98A
@@ -127,13 +127,17 @@ var (
 )
 
 func init() {
+	Init()
+}
+
+func Init() {
 	var err error
-	block, _ := pem.Decode(defaultRootCAPem)
+	block, _ := pem.Decode(DefaultRootCAPem)
 	defaultRootCA, err = x509.ParseCertificate(block.Bytes)
 	if err != nil {
 		panic(fmt.Errorf("加载根证书失败: %s", err))
 	}
-	block, _ = pem.Decode(defaultRootKeyPem)
+	block, _ = pem.Decode(DefaultRootKeyPem)
 	defaultRootKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
 		panic(fmt.Errorf("加载根证书私钥失败: %s", err))
@@ -300,9 +304,4 @@ func (c *Certificate) template(host string, expireYears int) *x509.Certificate {
 	}
 
 	return cert
-}
-
-// RootCA 根证书
-func DefaultRootCAPem() []byte {
-	return defaultRootCAPem
 }

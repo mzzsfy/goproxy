@@ -1,8 +1,10 @@
 # goproxy
+
 Go HTTP(S)代理库, 支持中间人代理解密HTTPS
 
 安装
 ----
+
 ```bash
 go get github.com/ouqiang/goproxy
 ```
@@ -36,6 +38,7 @@ func main() {
 ```
 
 ### 代理测试
+
 ```bash
 curl -x localhost:8080 https://www.baidu.com
 ```
@@ -43,6 +46,7 @@ curl -x localhost:8080 https://www.baidu.com
 中间人代理, 解密HTTPS
 ---
 系统需导入根证书 mitm-proxy.crt
+
 ```go
 package main
 
@@ -89,6 +93,7 @@ func main() {
 事件处理
 ---
 实现Delegate接口
+
 ```go
 type Delegate interface {
 	// Connect 收到客户端连接
@@ -107,6 +112,7 @@ type Delegate interface {
 	ErrorLog(err error)
 }
 ```
+
 ```go
 type EventHandler struct{}
 
