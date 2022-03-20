@@ -18,6 +18,7 @@ package cert
 import (
 	crand "crypto/rand"
 	"math/rand"
+	"regexp"
 	"strings"
 
 	"crypto/rsa"
@@ -162,13 +163,20 @@ func NewCertificate(cache Cache) *Certificate {
 	}
 }
 
+var isIp, _ = regexp.Compile("\\d{1,3}(?:.\\d{1,3}){3}")
+
 // GenerateTlsConfig 生成TLS配置
 func (c *Certificate) GenerateTlsConfig(host string) (*tls.Config, error) {
 	if h, _, err := net.SplitHostPort(host); err == nil {
-		if strings.Index(h, `.`) != strings.LastIndex(h, `.`) {
-			host = `*` + h[strings.Index(h, `.`):]
-		} else {
+		split := strings.Split(h, ".")
+		if len(split) == 4 && isIp.MatchString(h) {
 			host = h
+		} else {
+			if len(split) > 2 {
+				host = "*." + strings.Join(split[1:], ".")
+			} else {
+				host = h
+			}
 		}
 	}
 	if c.cache != nil {
