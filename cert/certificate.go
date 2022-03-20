@@ -165,7 +165,11 @@ func NewCertificate(cache Cache) *Certificate {
 // GenerateTlsConfig 生成TLS配置
 func (c *Certificate) GenerateTlsConfig(host string) (*tls.Config, error) {
 	if h, _, err := net.SplitHostPort(host); err == nil {
-		host = h
+		if strings.Index(h, `.`) != strings.LastIndex(h, `.`) {
+			host = `*` + h[strings.Index(h, `.`):]
+		} else {
+			host = h
+		}
 	}
 	if c.cache != nil {
 		// 先从缓存中查找证书
@@ -173,7 +177,6 @@ func (c *Certificate) GenerateTlsConfig(host string) (*tls.Config, error) {
 			tlsConf := &tls.Config{
 				Certificates: []tls.Certificate{*cert},
 			}
-
 			return tlsConf, nil
 		}
 	}
@@ -239,11 +242,11 @@ func (c *Certificate) GenerateCA() (*Pair, error) {
 	tmpl := &x509.Certificate{
 		SerialNumber: big.NewInt(rand.Int63()),
 		Subject: pkix.Name{
-			CommonName:   "Mars",
+			CommonName:   "GOPROXY ROOT CA",
 			Country:      []string{"China"},
-			Organization: []string{"4399.com"},
-			Province:     []string{"FuJian"},
-			Locality:     []string{"Xiamen"},
+			Organization: []string{"test.com"},
+			Province:     []string{"BeiJin"},
+			Locality:     []string{"BeiJin"},
 		},
 		NotBefore:             time.Now().AddDate(0, -1, 0),
 		NotAfter:              time.Now().AddDate(30, 0, 0),
@@ -252,7 +255,7 @@ func (c *Certificate) GenerateCA() (*Pair, error) {
 		MaxPathLen:            2,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
-		EmailAddresses:        []string{"qingqianludao@gmail.com"},
+		EmailAddresses:        []string{"test@test.com"},
 	}
 
 	derBytes, err := x509.CreateCertificate(crand.Reader, tmpl, tmpl, &priv.PublicKey, priv)
@@ -292,7 +295,7 @@ func (c *Certificate) template(host string, expireYears int) *x509.Certificate {
 		BasicConstraintsValid: true,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageDataEncipherment,
-		EmailAddresses:        []string{"qingqianludao@gmail.com"},
+		EmailAddresses:        []string{"test@test.com"},
 	}
 	hosts := strings.Split(host, ",")
 	for _, item := range hosts {
@@ -302,6 +305,5 @@ func (c *Certificate) template(host string, expireYears int) *x509.Certificate {
 			cert.DNSNames = append(cert.DNSNames, item)
 		}
 	}
-
 	return cert
 }
