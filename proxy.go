@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/mzzsfy/goproxy/cert"
 	"io"
 	"io/ioutil"
 	"net"
@@ -27,8 +28,6 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
-
-	"github.com/mzzsfy/goproxy/cert"
 )
 
 const (
